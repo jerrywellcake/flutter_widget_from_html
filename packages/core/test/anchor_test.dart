@@ -69,7 +69,7 @@ void main() {
               html,
               key: hwKey,
               renderMode: RenderMode.sliverList,
-            )
+            ),
           ],
         ),
         useExplainer: false,
@@ -367,14 +367,19 @@ ${htmlDesc * 3}
 final globalKey = GlobalKey<HtmlWidgetState>();
 
 Future<void> pumpWidget(WidgetTester tester, Widget child) async {
+  // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+  // ignore: deprecated_member_use
   tester.binding.window.physicalSizeTestValue = const Size(200, 200);
+  // ignore: deprecated_member_use
   addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-
+  // ignore: deprecated_member_use
   tester.binding.window.devicePixelRatioTestValue = 1.0;
+  // ignore: deprecated_member_use
   addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
-
+  // ignore: deprecated_member_use
   tester.binding.window.platformDispatcher.textScaleFactorTestValue = 1.0;
   addTearDown(
+    // ignore: deprecated_member_use
     tester.binding.window.platformDispatcher.clearTextScaleFactorTestValue,
   );
 
@@ -386,7 +391,7 @@ class _ColumnTestApp extends StatelessWidget {
   final String? html;
   final Key? keyBottom;
 
-  const _ColumnTestApp({this.html, Key? key, this.keyBottom}) : super(key: key);
+  const _ColumnTestApp({this.html, this.keyBottom});
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -408,7 +413,7 @@ class _ColumnTestApp extends StatelessWidget {
 class _ListViewTestApp extends StatelessWidget {
   final String? html;
 
-  const _ListViewTestApp({this.html, Key? key}) : super(key: key);
+  const _ListViewTestApp({this.html});
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -424,7 +429,7 @@ class _ListViewTestApp extends StatelessWidget {
 class _SliverListTestApp extends StatelessWidget {
   final Key? keyBottom;
 
-  const _SliverListTestApp({Key? key, this.keyBottom}) : super(key: key);
+  const _SliverListTestApp({this.keyBottom});
 
   @override
   Widget build(BuildContext _) => Scaffold(

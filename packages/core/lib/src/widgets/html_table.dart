@@ -25,15 +25,20 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: [TextDirection.ltr].
   final TextDirection textDirection;
 
+  // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+  // https://github.com/flutter/flutter/pull/119195
+  // https://github.com/flutter/flutter/commit/6a5405925dffb5b4121e1fba898d3d2068dac77c
+
   /// Creates a TABLE widget.
+  // ignore: prefer_const_constructors_in_immutables
   HtmlTable({
     this.border,
     this.borderCollapse = false,
     this.borderSpacing = 0.0,
-    required List<Widget> children,
+    required super.children,
     this.textDirection = TextDirection.ltr,
-    Key? key,
-  }) : super(children: children, key: key);
+    super.key,
+  });
 
   @override
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
@@ -80,17 +85,14 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 class HtmlTableCaption extends HtmlTableCell {
   /// Creates a table caption widget.
   const HtmlTableCaption({
-    required Widget child,
-    required int columnSpan,
+    required super.child,
+    required super.columnSpan,
     required int rowIndex,
-    Key? key,
+    super.key,
   }) : super._(
           columnStart: 0,
-          columnSpan: columnSpan,
           isCaption: true,
-          key: key,
           rowStart: rowIndex,
-          child: child,
         );
 }
 
@@ -130,11 +132,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
   const HtmlTableCell._({
     this.border,
-    required Widget child,
+    required super.child,
     this.columnSpan = 1,
     required this.columnStart,
     bool isCaption = false,
-    Key? key,
+    super.key,
     this.rowSpan = 1,
     required this.rowStart,
     this.width,
@@ -142,8 +144,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
         assert(columnStart >= 0),
         assert(rowSpan >= 1),
         assert(rowStart >= 0),
-        _isCaption = isCaption,
-        super(child: child, key: key);
+        _isCaption = isCaption;
 
   @override
   void applyParentData(RenderObject renderObject) {
@@ -201,6 +202,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));
     properties.add(IntProperty('rowStart', rowStart));
+    properties.add(DiagnosticsProperty('width', width, defaultValue: null));
   }
 
   @override
@@ -537,7 +539,7 @@ class _TableRenderLayouter {
   ) {
     final effectiveMinValues = List.filled(values.length, .0);
     for (var i = 0; i < values.length; i++) {
-      if (calculatedMinValues[i] > 0 && calculatedMinValues[i] >= values[i]) {
+      if (calculatedMinValues[i] > .0 && calculatedMinValues[i] >= values[i]) {
         // min value is smaller than in-calculation width
         // let's keep the current value as long as possible
         // we want the column to grow to its dry size naturally
@@ -546,20 +548,29 @@ class _TableRenderLayouter {
     }
 
     final remaining = max(.0, available - effectiveMinValues.sum);
+    var valuesCount = 0;
     var valuesSum = .0;
     for (var i = 0; i < values.length; i++) {
-      if (effectiveMinValues[i] == 0) {
+      if (effectiveMinValues[i] == .0) {
+        valuesCount++;
         valuesSum += values[i];
       }
     }
 
     final result = effectiveMinValues.toList(growable: false);
-    if (valuesSum > .0) {
+    if (valuesCount > 0) {
       for (var i = 0; i < values.length; i++) {
-        if (result[i] == 0) {
+        if (result[i] != .0) {
+          continue;
+        }
+
+        if (valuesSum.isFinite) {
           // calculate widths using weighted distribution
           // e.g. if a column has huge dry width, it will have bigger width
           result[i] = values[i] / valuesSum * remaining;
+        } else {
+          // split the remaining width equally if SUM(values) is not usable
+          result[i] = remaining / valuesCount;
         }
       }
     }

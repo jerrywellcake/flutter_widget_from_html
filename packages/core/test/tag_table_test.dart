@@ -146,14 +146,20 @@ Future<void> main() async {
       const html =
           '<table border="1"><tbody><tr><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      expect(
+        explained,
+        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
+      );
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
       const html = '<table style="border: 1px solid black"><tbody>'
           '<tr><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      expect(
+        explained,
+        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
+      );
     });
   });
 
@@ -226,8 +232,13 @@ Future<void> main() async {
       const html = '<table border="1" style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(borderCollapse: true, borderSpacing: 2.0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains(
+          'HtmlTable(border: all(BorderSide), borderCollapse: true, borderSpacing: 2.0)',
+        ),
+      );
     });
   });
 
@@ -377,6 +388,57 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(explained, isNot(contains('[Align:alignment=centerLeft,child=')));
       expect(explained, contains('[Align:alignment=topLeft,child='));
+    });
+  });
+
+  group('width', () {
+    testWidgets('renders without width', (WidgetTester tester) async {
+      const html = '<table><tr><td>Foo</td></tr></table>';
+      final e = await explain(tester, html, useExplainer: false);
+      expect(e, contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders width: 50px', (WidgetTester tester) async {
+      const html = '<table><tr><td style="width: 50px">Foo</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 50.0)'),
+      );
+    });
+
+    testWidgets('renders width: 100%', (WidgetTester tester) async {
+      const html = '<table><tr><td style="width: 100%">Foo</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
+      );
+    });
+
+    testWidgets('renders width: 100% within TABLE', (tester) async {
+      const html = '<table><tr><td>'
+          '<table><tr><td style="width: 100%">'
+          'Foo'
+          '</td></tr></table>'
+          '</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
+      );
     });
   });
 
@@ -858,6 +920,18 @@ Future<void> main() async {
     <td style="background: green; width: 70%">Bar</td>
   </tr>
 </table>''',
+              'width_in_percent_100_nested': '''
+<table border="1">
+  <tr>
+    <td>
+      <table border="1">
+        <tr>
+          <td style="width: 100%">Foo</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>''',
               'width_in_px': '''
 <table border="1">
   <tr>
@@ -896,7 +970,7 @@ Future<void> main() async {
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key? key}) : super(key: key);
+  const _Golden(this.contents);
 
   @override
   Widget build(BuildContext _) => Scaffold(

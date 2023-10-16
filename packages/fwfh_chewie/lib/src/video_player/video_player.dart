@@ -53,11 +53,11 @@ class VideoPlayer extends StatefulWidget {
     this.autoplay = false,
     this.controls = false,
     this.errorBuilder,
-    Key? key,
+    super.key,
     this.loadingBuilder,
     this.loop = false,
     this.poster,
-  }) : super(key: key);
+  });
 
   @override
   State<VideoPlayer> createState() => _VideoPlayerState();
@@ -115,6 +115,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   Future<void> _initControllers() async {
+    // TODO: remove lint ignore when our minimum video_player version >= 2.7
+    // ignore: deprecated_member_use
     final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
     Object? vpcError;
     try {

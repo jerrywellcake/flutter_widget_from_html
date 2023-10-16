@@ -7,6 +7,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
@@ -30,7 +33,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -72,7 +75,7 @@ jobs:
           cat pubspec.yaml
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
       - run: flutter test
@@ -86,8 +89,6 @@ jobs:
           - stable
 
     # In case one of these fails, create a new PR against the `release/*` branch
-    # and publish a new version to make sure there is a compatible version
-    # of `fwfh_text_style` for all active Flutter versions.
     name: core@${{ matrix.channel }}
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -97,7 +98,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -110,7 +111,7 @@ jobs:
           # output for debugging
           cat pubspec.yaml
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
           channel: ${{ matrix.channel }}
       - run: flutter test

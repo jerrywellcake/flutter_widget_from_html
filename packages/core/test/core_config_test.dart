@@ -124,7 +124,7 @@ void main() {
         tester,
         html,
         enableCaching: true,
-        baseUrl: Uri.http('domain.com', ''),
+        baseUrl: Uri.http('domain.com'),
       );
       final built2 = helper.buildCurrentState();
       enableCachingExpect(built1, built2, isFalse);
@@ -627,11 +627,10 @@ class _OnTapUrlApp extends StatelessWidget {
   final List? onTapCallbackResults;
 
   const _OnTapUrlApp({
-    Key? key,
     required this.href,
     this.onTapCallbackResults,
     this.onTapUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext _) => MaterialApp(

@@ -588,7 +588,7 @@ void main() {
               'child_width_gt_max_width':
                   '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
               childHeightGtMaxHeight:
-                  '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />'
+                  '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />',
             };
 
             for (final testCase in testCases.entries) {
@@ -699,7 +699,7 @@ void main() {
 class _Golden extends StatelessWidget {
   final String html;
 
-  const _Golden(this.html, {Key? key}) : super(key: key);
+  const _Golden(this.html);
 
   @override
   Widget build(BuildContext _) => Scaffold(

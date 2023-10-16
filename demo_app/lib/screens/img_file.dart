@@ -6,7 +6,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImgFileScreen extends StatelessWidget {
-  const ImgFileScreen({Key key}) : super(key: key);
+  const ImgFileScreen({super.key});
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
@@ -24,11 +24,11 @@ class ImgFileScreen extends StatelessWidget {
           body: const TabBarView(
             children: <Widget>[
               _ImgFileTab(
-                assetKey: 'logos/android.png',
+                assetKey: 'logos/icon.png',
                 fileExtension: 'png',
               ),
               _ImgFileTab(
-                assetKey: 'packages/fwfh_svg/test/images/logo.svg',
+                assetKey: 'packages/fwfh_svg/test/images/icon.svg',
                 fileExtension: 'svg',
               ),
             ],
@@ -42,10 +42,9 @@ class _ImgFileTab extends StatefulWidget {
   final String fileExtension;
 
   const _ImgFileTab({
-    @required this.assetKey,
-    @required this.fileExtension,
-    Key key,
-  }) : super(key: key);
+    required this.assetKey,
+    required this.fileExtension,
+  });
 
   @override
   State<_ImgFileTab> createState() => _ImgFileState();
@@ -96,8 +95,9 @@ class _ImgFileState extends State<_ImgFileTab> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final file = snapshot.data;
-                  final html = '<img src="file://${file.path}" />';
+                  final file = snapshot.requireData;
+                  final html =
+                      '<img src="file://${file.path}" width="48" height="48" />';
 
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -115,8 +115,6 @@ class _ImgFileState extends State<_ImgFileTab> {
             case _ImgFileStatus.writeFileError:
               return const Center(child: Text('Unable to write file'));
           }
-
-          return const SizedBox.shrink();
         },
       );
 
